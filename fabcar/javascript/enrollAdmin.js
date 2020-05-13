@@ -5,24 +5,42 @@
 'use strict';
 
 const FabricCAServices = require('fabric-ca-client');
-const { Wallets } = require('fabric-network');
+const { Wallets, HsmX509Provider } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
+const utils = require('fabric-common/lib/Utils');
 
 async function main() {
     try {
         // load the network configuration
-        const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
-        const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
-
+        const ccpPath = path.resolve(__dirname, '..', '..', 'first-network', 'connection-org1.json');
+        const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
+        const ccp = JSON.parse(ccpJSON);
+        
+        utils.setConfigSetting('crypto-hsm',true);
+        utils.setConfigSetting('crypto-pkcs11-lib','/usr/lib/arm-linux-gnueabihf/pkcs11/libtpm2_pkcs11.so');
+        utils.setConfigSetting('crypto-pkcs11-pin','1234');
+        utils.setConfigSetting('crypto-pkcs11-label','fabric');
+        utils.setConfigSetting('crypto-pkcs11-slot',0);
+        utils.setConfigSetting('crypto-pkcs11-usertype',1);
+	utils.setConfigSetting('crypto-pkcs11-readwrite',true);
+        utils.setConfigSetting('crypto-pkcs11-security',256);
+        
         // Create a new CA client for interacting with the CA.
         const caInfo = ccp.certificateAuthorities['ca.org1.example.com'];
         const caTLSCACerts = caInfo.tlsCACerts.pem;
-        const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
-
+        const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts}, caInfo.caName);
+        
+        const hsmProvider = new HsmX509Provider({
+    		lib: '/usr/lib/arm-linux-gnueabihf/pkcs11/libtpm2_pkcs11.so',
+    		pin: '1234',
+    		slot: 0
+	});
+        
         // Create a new file system based wallet for managing identities.
         const walletPath = path.join(process.cwd(), 'wallet');
         const wallet = await Wallets.newFileSystemWallet(walletPath);
+        wallet.getProviderRegistry().addProvider(hsmProvider);
         console.log(`Wallet path: ${walletPath}`);
 
         // Check to see if we've already enrolled the admin user.
@@ -37,10 +55,10 @@ async function main() {
         const x509Identity = {
             credentials: {
                 certificate: enrollment.certificate,
-                privateKey: enrollment.key.toBytes(),
+                ski: enrollment.key._ski.toString('hex'),
             },
             mspId: 'Org1MSP',
-            type: 'X.509',
+            type: 'HSM-X.509',
         };
         await wallet.put('admin', x509Identity);
         console.log('Successfully enrolled admin user "admin" and imported it into the wallet');
