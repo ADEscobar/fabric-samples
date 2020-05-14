@@ -1,5 +1,5 @@
---- /home/pi/Documents/fabric-samples/fabcar/javascript/node_modules/fabric-common/lib/impl/bccsp_pkcs11.js	1985-10-26 09:15:00.000000000 +0100
-+++ node_modules/fabric-common/lib/impl/bccsp_pkcs11.js	2020-05-14 15:17:52.359946027 +0200
+--- ./node_modules/fabric-common/lib/impl/bccsp_pkcs11.js	1985-10-26 09:15:00.000000000 +0100
++++ ./node_modules/fabric-common/lib/impl/bccsp_pkcs11.js	2020-05-14 15:17:52.359946027 +0200
 @@ -56,7 +56,7 @@
  	return callsite()[1].getFunctionName() +
  		'[' + callsite()[1].getLineNumber() + ']: ';
@@ -91,7 +91,7 @@
  
  		return {ski, ecpt, pub: handles.publicKey, priv: handles.privateKey};
  
---- /home/pi/Documents/fabric-samples/fabcar/javascript/node_modules/fabric-network/lib/impl/wallet/hsmx509identity.js	1985-10-26 09:15:00.000000000 +0100
+--- ./node_modules/fabric-network/lib/impl/wallet/hsmx509identity.js	1985-10-26 09:15:00.000000000 +0100
 +++ ./node_modules/fabric-network/lib/impl/wallet/hsmx509identity.js	2020-05-14 15:12:33.624555429 +0200
 @@ -32,6 +32,7 @@
              return {
