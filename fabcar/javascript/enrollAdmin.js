@@ -29,7 +29,7 @@ async function main() {
         // Create a new CA client for interacting with the CA.
         const caInfo = ccp.certificateAuthorities['ca.org1.example.com'];
         const caTLSCACerts = caInfo.tlsCACerts.pem;
-        const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts}, caInfo.caName);
+        const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify:false}, caInfo.caName);
         
         const hsmProvider = new HsmX509Provider({
     		lib: '/usr/lib/arm-linux-gnueabihf/pkcs11/libtpm2_pkcs11.so',

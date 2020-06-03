@@ -15,7 +15,7 @@
     "author": "Hyperledger",
     "license": "Apache-2.0",
     "dependencies": {
-	"callsite": "^1.0.0",
+        "callsite": "^1.0.0",
         "fabric-ca-client": "2.1.0",
         "fabric-network": "2.1.0"
     },
